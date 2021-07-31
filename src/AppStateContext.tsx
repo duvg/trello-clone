@@ -2,6 +2,9 @@ import React, { createContext, useReducer, useContext } from 'react';
 import { nanoid } from 'nanoid';
 import { findItemIndexById, overrideItemAtIndex, moveItem, removeItemAtIndex,insertItemAtIndex } from './utils/arrayUtils';
 import { DragItem } from './DragItem';
+import { useEffect } from 'react';
+import { save } from './api/api';
+import { withData } from './WithData';
 
 // Interfaces
 interface Task {
@@ -176,33 +179,25 @@ const appStateReducer = (state: AppState, action: Action): AppState => {
 const appData: AppState = {
   draggedItem: undefined,
   lists: [
-      {
-          id: "0",
-          text: "To Do",
-          tasks: [{ id: "c0", text: "Generate app scaffold" }]
-      },
-      {
-          id: "1",
-          text: "In Progress",
-          tasks: [{ id: "c2", text: "Learn Typescript" }]
-      },
-      {
-          id: "2",
-          text: "Done",
-          tasks: [{ id: "c3", text: "Begin to use static typing" }]
-      }
+      
   ]
 }
 
-export const AppStateProvider = ({ children }: React.PropsWithChildren<{}>) => {
-    const [state, dispatch] = useReducer(appStateReducer, appData)
+
+
+export const AppStateProvider = withData(({ children, initialState }: React.PropsWithChildren<{initialState: AppState}>) => {
+    const [state, dispatch] = useReducer(appStateReducer, initialState);
+
+    useEffect(() => {
+      save(state)
+    },[state])
 
     return(
         <AppStateContext.Provider value={{ state, dispatch }}>
             { children }
         </AppStateContext.Provider>
     );
-}
+})
 
 // define global useContext
 export const useAppState = () => {
