@@ -1,20 +1,31 @@
 import React from 'react';
+import { useAppState } from './AppStateContext';
+import { AddNewItem } from './components/AddNewItem';
 import { Card } from './components/Card';
 import { Column } from './components/Column';
 import { AppContainer } from "./styles";
+import CustomDragLayer  from './components/CustomDragLayer';
 
 function App() {
+
+  const { state, dispatch } = useAppState();
+
   return (
     <AppContainer>
-      <Column text="To Do">
-        <Card text="Generate app scaffold" />
-      </Column>
-      <Column text="In Progress">
-        <Card text="Learn TypesScript" />
-      </Column>
-      <Column text="Done">
-        <Card text="Beginto use static typing" />
-      </Column>
+      <CustomDragLayer />
+      {state.lists.map((list, i) => (
+        <Column
+          text={list.text}
+          key={list.id}
+          id={list.id}
+          index={i}
+        />
+      ))}
+      
+      <AddNewItem
+        toggleButtonText="+ Add another list"
+        onAdd={text => dispatch({ type: "ADD_LIST", payload: text })}
+      />
     </AppContainer>
   );
 }
